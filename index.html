@@ -145,8 +145,7 @@ function createLevel2(){
   let n=Math.floor(Math.random()*6)+2;
   let type=Math.floor(Math.random()*3);
 
-  const mid = `${v}${n}${w}`; // alphabetisch wäre falsch, hier: v und w zufällig → NICHT Mischen
-  const mid2 = `${v}${w}`.split("").sort().join(""); // Für Formeln korrekt ordnen
+  const mid2=[v,w].sort().join("");
 
   if(type===0){
     correct = `${v}²+${2*n}${mid2}+${n*n}${w}²`;
@@ -171,7 +170,7 @@ function createLevel3(){
   let a=Math.floor(Math.random()*4)+2;
   let b=Math.floor(Math.random()*4)+2;
 
-  const mid = [v1,v2].sort().join("");
+  const mid=[v1,v2].sort().join("");
 
   let t=Math.random()<0.7?0:1;
 
@@ -185,6 +184,27 @@ function createLevel3(){
 }
 
 // --------------------------------------------------
+// Level beenden + Level-Up
+// --------------------------------------------------
+function finishLevel(){
+  if(score >= 8){
+    if(level < 3){
+      alert(`🎉 Level ${level} geschafft! Du steigst auf zu Level ${level+1}!`);
+      level++;
+    } else {
+      alert(`🏆 Level 3 geschafft! Alle Levels abgeschlossen!`);
+    }
+  } else {
+    alert(`❌ Level nicht geschafft. Du brauchst mindestens 8 Punkte.`);
+  }
+
+  // Reset
+  round = 1;
+  score = 0;
+  segments.forEach(s=>s.style.background="#ddd");
+}
+
+// --------------------------------------------------
 // Neue Aufgabe
 // --------------------------------------------------
 function newTask(){
@@ -194,11 +214,8 @@ function newTask(){
   answered=false;
   firstTry=true;
 
-  if(round>total){
-    alert(`Level beendet! Punkte: ${score}/${total}`);
-    round=1;
-    score=0;
-    segments.forEach(s=>s.style.background="#ddd");
+  if(round > total){
+    finishLevel();
   }
 
   levelDisplay.textContent=`Level ${level}`;
@@ -236,7 +253,6 @@ function check(){
     return;
   }
 
-  // Erster Klick
   answered = true;
 
   if(inpNorm===solNorm){
@@ -262,7 +278,8 @@ function check(){
   firstTry = false;
   round++;
 
-  scoreEl.textContent=`Aufgabe ${Math.min(round,total)} von ${total} – Punkte: ${score}`;
+  scoreEl.textContent=
+    `Aufgabe ${Math.min(round,total)} von ${total} – Punkte: ${score}`;
 }
 
 // --------------------------------------------------
@@ -281,5 +298,6 @@ newTask();
 
 </body>
 </html>
+
 
 
