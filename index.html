@@ -4,30 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Binomische Formeln – Trainer</title>
+
 <style>
- body{font-family:system-ui,Arial;margin:0;padding:20px;text-align:center;background:linear-gradient(to bottom right,#eef2ff,#e0f7fa)}
- h1{margin:10px 0;font-size:1.8em;color:#333}
- #task{font-size:1.6em;margin:15px auto;white-space:pre-line}
- #result{font-size:1.1em;margin:10px;color:#000}
- #score{margin:8px;color:#333}
- #levelDisplay{font-weight:bold;color:#007bff;margin-bottom:5px}
- #progressContainer{width:80%;max-width:400px;height:20px;background:#ddd;border-radius:10px;margin:10px auto 20px;overflow:hidden;display:flex}
- .progress-segment{flex:1;height:100%;transition:background-color .3s}
- input{padding:10px;font-size:1.2em;width:80%;max-width:300px;text-align:center;border-radius:8px;border:1px solid #aaa}
- input:focus{outline:none;border-color:#007bff}
- button{background:#007bff;color:white;border:none;padding:10px 18px;margin:6px;border-radius:8px;cursor:pointer}
- button:hover{background:#0056b3}
+body{
+  font-family:system-ui,Arial;
+  margin:0;padding:20px;text-align:center;
+  background:linear-gradient(to bottom right,#eef2ff,#e0f7fa);
+}
+h1{font-size:1.8em;margin:10px 0;color:#333}
+#task{font-size:1.6em;margin:15px auto;white-space:pre-line}
+#result{font-size:1.1em;margin:10px;color:#000}
+#score{margin:8px;color:#333}
+#levelDisplay{font-weight:bold;color:#007bff;margin-bottom:5px}
+#progressContainer{
+  width:80%;max-width:400px;height:20px;
+  background:#ddd;border-radius:10px;
+  margin:10px auto 20px;overflow:hidden;display:flex;
+}
+.progress-segment{
+  flex:1;height:100%;background:#ddd;
+  transition:background-color .3s;
+}
+input{
+  padding:10px;font-size:1.2em;width:80%;
+  max-width:300px;text-align:center;
+  border-radius:8px;border:1px solid #aaa;
+}
+button{
+  background:#007bff;color:white;border:none;
+  padding:10px 18px;margin:6px;border-radius:8px;cursor:pointer;
+}
+button:hover{background:#0056b3}
 </style>
 </head>
+
 <body>
 
-<h1>Trainer – 3 Binomische Formeln</h1>
+<h1>Trainer – 3 binomische Formeln</h1>
+
 <div id="levelDisplay">Level 1: Nur Variablen</div>
 <div id="score">Lade...</div>
+
 <div id="progressContainer"></div>
+
 <div id="task">...</div>
 
-<input id="answer" placeholder="Lösung eingeben" autocomplete="off"><br>
+<input id="answer" autocomplete="off" placeholder="Lösung eingeben"><br>
 <button id="checkBtn">Prüfen</button>
 <button id="newBtn">Neue Aufgabe</button>
 
@@ -36,168 +58,228 @@
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
 
- const answer=document.getElementById("answer");
- const task=document.getElementById("task");
- const result=document.getElementById("result");
- const scoreEl=document.getElementById("score");
- const levelDisplay=document.getElementById("levelDisplay");
- const checkBtn=document.getElementById("checkBtn");
- const newBtn=document.getElementById("newBtn");
- const progress=document.getElementById("progressContainer");
+// --------------------------------------------------
+// Elemente
+// --------------------------------------------------
+const answer = document.getElementById("answer");
+const task = document.getElementById("task");
+const result = document.getElementById("result");
+const scoreEl = document.getElementById("score");
+const levelDisplay = document.getElementById("levelDisplay");
+const checkBtn = document.getElementById("checkBtn");
+const newBtn = document.getElementById("newBtn");
+const progress = document.getElementById("progressContainer");
 
- const VARS=['a','b','c','x','y','u','v'];
- const rc=a=>a[Math.floor(Math.random()*a.length)];
- const sortVars=s=>s.replace(/\s+/g,'');
+// --------------------------------------------------
+// Variablen
+// --------------------------------------------------
+const VARS = ['a','b','c','x','y','u','v'];
+const rc = a => a[Math.floor(Math.random()*a.length)];
+const sortVars = s => s.replace(/\s+/g,'');
 
- let correct="";
- let level=1,round=1,score=0,total=10;
- let segments=[];
+let correct = "";
+let level = 1;
+let round = 1;
+let score = 0;
+let total = 10;
 
- // ------------------------------
- // 🟩 FIX: Fortschrittsbalken sauber initialisieren
- // ------------------------------
- function initBar(){
-   progress.innerHTML="";
-   segments=[];
-   for(let i=0;i<total;i++){
-     const d=document.createElement("div");
-     d.className="progress-segment";
-     d.style.background="#ddd";
-     progress.appendChild(d);
-     segments.push(d);
-   }
- }
+let answered = false;
+let firstTry = true;
 
- const fixedHint={
-  1:"(a + b)² = a² + 2ab + b²  und  (a - b)² = a² - 2ab + b²  und  (a + b)(a - b) = a² - b²",
-  2:"Ersetze die Zahl durch eine Konstante und wende direkt die Formel an.",
-  3:"Achte auf sortierte Variablen und darauf, beide Terme zu quadrieren und das Doppelte des Produkts einzubauen."
- };
+let segments = [];
 
- // ---------------------------------------------
- // Level 1 – Korrekte alphabetische Mittelterme
- // ---------------------------------------------
- function createLevel1(){
-   const a=rc(VARS), b=rc(VARS);
-   if(a===b) return createLevel1();
+// --------------------------------------------------
+// Feste Hinweise
+// --------------------------------------------------
+const fixedHint = {
+  1:"(a + b)² = a² + 2ab + b²<br>(a - b)² = a² - 2ab + b²<br>(a + b)(a - b) = a² - b²",
+  2:"Bei Zahl + Variable: erst Zahl und Variable wie a und b behandeln, dann Formel anwenden.",
+  3:"Bei (ax + by): immer Koeffizienten quadrieren und mittleren Term alphabetisch schreiben."
+};
 
-   const ab=[a,b].sort().join(""); // alphabetisch
-   const type=Math.floor(Math.random()*3);
+// --------------------------------------------------
+// Fortschrittsbalken initialisieren
+// --------------------------------------------------
+function initBar(){
+  progress.innerHTML="";
+  segments=[];
+  for(let i=0;i<total;i++){
+    const d=document.createElement("div");
+    d.className="progress-segment";
+    progress.appendChild(d);
+    segments.push(d);
+  }
+}
 
-   if(type===0){
-     correct=`${a}²+2${ab}+${b}²`;
-     return `(${a}+${b})² = ?`;
-   }
-   if(type===1){
-     correct=`${a}²-2${ab}+${b}²`;
-     return `(${a}-${b})² = ?`;
-   }
+// --------------------------------------------------
+// Aufgaben Level 1
+// --------------------------------------------------
+function createLevel1(){
+  let a=rc(VARS), b=rc(VARS);
+  if(a===b) return createLevel1();
 
-   // 3. Binomische Formel → Malpunkte in der Aufgabenstellung
-   correct=`${a}²-${b}²`;
-   return `(${a} + ${b}) · (${a} - ${b}) = ?`;
- }
+  const mid=[a,b].sort().join(""); // alphabetisch
+  
+  const t = Math.floor(Math.random()*3);
 
- // ---------------------------------------------
- // Level 2 – Zahl + Variable
- // ---------------------------------------------
- function createLevel2(){
-   const a=rc(VARS), b=rc(VARS), n=Math.floor(Math.random()*5)+2;
-   if(a===b) return createLevel2();
+  if(t===0){
+    correct = `${a}²+2${mid}+${b}²`;
+    return `(${a} + ${b})² = ?`;
+  }
+  if(t===1){
+    correct = `${a}²-2${mid}+${b}²`;
+    return `(${a} - ${b})² = ?`;
+  }
 
-   const type=Math.floor(Math.random()*3);
+  correct = `${a}²-${b}²`;
+  return `(${a} + ${b}) · (${a} - ${b}) = ?`;
+}
 
-   if(type===0){
-     correct=`${a}²+2${a}${n}${b}+${n*n}${b}²`;
-     return `(${a}+${n}${b})² = ?`;
-   }
-   if(type===1){
-     correct=`${a}²-2${a}${n}${b}+${n*n}${b}²`;
-     return `(${a}-${n}${b})² = ?`;
-   }
+// --------------------------------------------------
+// Aufgaben Level 2
+// --------------------------------------------------
+function createLevel2(){
+  let v=rc(VARS), w=rc(VARS);
+  if(v===w) return createLevel2();
 
-   correct=`${a}²-${n*n}${b}²`;
-   return `(${a}+${n}${b}) · (${a}-${n}${b}) = ?`;
- }
+  let n=Math.floor(Math.random()*6)+2;
+  let type=Math.floor(Math.random()*3);
 
- // ---------------------------------------------
- // Level 3 – ax + by Formen
- // ---------------------------------------------
- function createLevel3(){
-   const v1=rc(VARS), v2=rc(VARS);
-   if(v1===v2) return createLevel3();
+  const mid = `${v}${n}${w}`; // alphabetisch wäre falsch, hier: v und w zufällig → NICHT Mischen
+  const mid2 = `${v}${w}`.split("").sort().join(""); // Für Formeln korrekt ordnen
 
-   const a=Math.floor(Math.random()*4)+2;
-   const b=Math.floor(Math.random()*4)+2;
+  if(type===0){
+    correct = `${v}²+${2*n}${mid2}+${n*n}${w}²`;
+    return `(${v} + ${n}${w})² = ?`;
+  }
+  if(type===1){
+    correct = `${v}²-${2*n}${mid2}+${n*n}${w}²`;
+    return `(${v} - ${n}${w})² = ?`;
+  }
 
-   const midVars=[v1,v2].sort().join("");
-   const type=Math.random()<0.7?0:1;
+  correct = `${v}²-${n*n}${w}²`;
+  return `(${v} + ${n}${w}) · (${v} - ${n}${w}) = ?`;
+}
 
-   if(type===0){
-     correct=`${a*a}${v1}²+${2*a*b}${midVars}+${b*b}${v2}²`;
-     return `(${a}${v1} + ${b}${v2})² = ?`;
-   } else {
-     correct=`${a*a}${v1}²-${b*b}${v2}²`;
-     return `(${a}${v1} + ${b}${v2}) · (${a}${v1} - ${b}${v2}) = ?`;
-   }
- }
+// --------------------------------------------------
+// Aufgaben Level 3
+// --------------------------------------------------
+function createLevel3(){
+  let v1=rc(VARS), v2=rc(VARS);
+  if(v1===v2) return createLevel3();
 
- // ------------------------------
- // Neue Aufgabe
- // ------------------------------
- function newTask(){
-   result.innerHTML="";
-   answer.value="";
+  let a=Math.floor(Math.random()*4)+2;
+  let b=Math.floor(Math.random()*4)+2;
 
-   if(round>total){
-     alert(`Level beendet! Punkte: ${score}/${total}`);
-     round=1;
-     score=0;
-     segments.forEach(s=>s.style.background="#ddd");
-   }
+  const mid = [v1,v2].sort().join("");
 
-   levelDisplay.textContent=`Level ${level}`;
-   scoreEl.textContent=`Aufgabe ${round} von ${total} – Punkte: ${score}`;
+  let t=Math.random()<0.7?0:1;
 
-   if(level===1) task.textContent=createLevel1();
-   else if(level===2) task.textContent=createLevel2();
-   else task.textContent=createLevel3();
- }
+  if(t===0){
+    correct = `${a*a}${v1}²+${2*a*b}${mid}+${b*b}${v2}²`;
+    return `(${a}${v1} + ${b}${v2})² = ?`;
+  }
 
- // ------------------------------
- // 🟩 FIXED CHECK: round++ nur einmal
- // ------------------------------
- function check(){
-   const inp=answer.value.trim();
-   if(!inp) return;
+  correct = `${a*a}${v1}²-${b*b}${v2}²`;
+  return `(${a}${v1} + ${b}${v2}) · (${a}${v1} - ${b}${v2}) = ?`;
+}
 
-   const inpNorm=sortVars(inp);
-   const solNorm=sortVars(correct);
+// --------------------------------------------------
+// Neue Aufgabe
+// --------------------------------------------------
+function newTask(){
+  result.innerHTML="";
+  answer.value="";
 
-   if(inpNorm===solNorm){
-     segments[round-1].style.background="#4caf50";
-     result.style.color="green";
-     result.textContent="Richtig!";
-     score++;
-   } else {
-     segments[round-1].style.background="#d9534f";
-     result.style.color="black";
-     result.innerHTML=`❌ Falsch! Richtige Lösung: <b>${correct}</b><br><br><b>Hinweis:</b><br>${fixedHint[level]}`;
-   }
+  answered=false;
+  firstTry=true;
 
-   round++;
-   scoreEl.textContent=`Aufgabe ${Math.min(round,total)} von ${total} – Punkte: ${score}`;
- }
+  if(round>total){
+    alert(`Level beendet! Punkte: ${score}/${total}`);
+    round=1;
+    score=0;
+    segments.forEach(s=>s.style.background="#ddd");
+  }
 
- checkBtn.onclick=check;
- newBtn.onclick=newTask;
- answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+  levelDisplay.textContent=`Level ${level}`;
+  scoreEl.textContent=`Aufgabe ${round} von ${total} – Punkte: ${score}`;
 
- initBar();
- newTask();
+  if(level===1) task.textContent=createLevel1();
+  else if(level===2) task.textContent=createLevel2();
+  else task.textContent=createLevel3();
+}
+
+// --------------------------------------------------
+// CHECK – identisch zum funktionierenden Multiplikationstrainer
+// --------------------------------------------------
+function check(){
+  const input=answer.value.trim();
+  if(!input){
+    result.style.color="#555";
+    result.textContent="Bitte gib eine Lösung ein.";
+    return;
+  }
+  answer.blur();
+
+  const inpNorm=sortVars(input);
+  const solNorm=sortVars(correct);
+
+  // Zweiter Klick → kein Balken, keine Punkte
+  if(answered){
+    if(inpNorm===solNorm){
+      result.style.color="green";
+      result.textContent="✅ Richtig – aber kein Punkt mehr";
+    } else {
+      result.style.color="black";
+      result.innerHTML=`❌ Falsch! Richtige Lösung: <b>${correct}</b>`;
+    }
+    return;
+  }
+
+  // Erster Klick
+  answered = true;
+
+  if(inpNorm===solNorm){
+    result.style.color="green";
+
+    if(firstTry){
+      result.textContent="✅ Richtig! (+1 Punkt)";
+      score++;
+    } else {
+      result.textContent="✅ Richtig – aber kein Punkt mehr";
+    }
+
+    segments[round-1].style.background="#4caf50";
+
+  } else {
+    result.style.color="black";
+    segments[round-1].style.background="#d9534f";
+
+    result.innerHTML=
+      `❌ Falsch! Richtige Lösung: <b>${correct}</b><br><br><b>Hinweis:</b><br>${fixedHint[level]}`;
+  }
+
+  firstTry = false;
+  round++;
+
+  scoreEl.textContent=`Aufgabe ${Math.min(round,total)} von ${total} – Punkte: ${score}`;
+}
+
+// --------------------------------------------------
+// Events
+// --------------------------------------------------
+checkBtn.onclick=check;
+newBtn.onclick=newTask;
+answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+
+// Start
+initBar();
+newTask();
 
 });
 </script>
+
 </body>
 </html>
+
 
