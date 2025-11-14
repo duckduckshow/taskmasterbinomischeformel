@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  let level=1,round=1,score=0,total=10;
  let segments=[];
 
- function initBar(){progress.innerHTML="";segments=[];for(let i=0;i<total;i++){const d=document.createElement('div');d.className='progress-segment';progress.appendChild(d);segments.push(d);}}
+ function function initBar(){progress.innerHTML="";segments=[];for(let i=0;i<total;i++){const d=document.createElement('div');d.className='progress-segment';d.style.background='#ddd';progress.appendChild(d);segments.push(d);}}(){progress.innerHTML="";segments=[];for(let i=0;i<total;i++){const d=document.createElement('div');d.className='progress-segment';progress.appendChild(d);segments.push(d);}}
 
  const fixedHint={
  1:"(a + b)² = a² + 2ab + b²  und  (a - b)² = a² - 2ab + b²  und  (a + b)(a - b) = a² - b²",
@@ -117,3 +117,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 </script>
 </body>
 </html>
+
