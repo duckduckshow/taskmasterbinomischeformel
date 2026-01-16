@@ -42,7 +42,7 @@ button:hover{background:#0056b3}
 
 <h1>Trainer – 3 binomische Formeln</h1>
 
-<div id="levelDisplay">Level 1: Nur Variablen</div>
+<div id="levelDisplay">Level 1</div>
 <div id="score">Lade...</div>
 
 <div id="progressContainer"></div>
@@ -89,16 +89,16 @@ let firstTry = true;
 let segments = [];
 
 // --------------------------------------------------
-// Feste Hinweise
+// Hinweise
 // --------------------------------------------------
 const fixedHint = {
   1:"(a + b)² = a² + 2ab + b²<br>(a - b)² = a² - 2ab + b²<br>(a + b)(a - b) = a² - b²",
   2:"Bei Zahl + Variable: erst Zahl und Variable wie a und b behandeln, dann Formel anwenden.",
-  3:"Bei (ax + by): immer Koeffizienten quadrieren und mittleren Term alphabetisch schreiben."
+  3:"Bei (ax + by): Koeffizienten quadrieren und im mittleren Term multiplizieren."
 };
 
 // --------------------------------------------------
-// Fortschrittsbalken initialisieren
+// Fortschrittsbalken
 // --------------------------------------------------
 function initBar(){
   progress.innerHTML="";
@@ -112,93 +112,102 @@ function initBar(){
 }
 
 // --------------------------------------------------
-// Aufgaben Level 1
+// Level 1 – nur Variablen (alphabetisch)
 // --------------------------------------------------
 function createLevel1(){
-  let a=rc(VARS), b=rc(VARS);
-  if(a===b) return createLevel1();
+  let a = rc(VARS), b = rc(VARS);
+  if(a === b) return createLevel1();
 
-  const mid=[a,b].sort().join(""); // alphabetisch
-  
+  let vars = [a,b].sort();
+  let v1 = vars[0];
+  let v2 = vars[1];
+
+  const mid = v1 + v2;
   const t = Math.floor(Math.random()*3);
 
   if(t===0){
-    correct = `${a}²+2${mid}+${b}²`;
-    return `(${a} + ${b})² = ?`;
+    correct = `${v1}²+2${mid}+${v2}²`;
+    return `(${v1} + ${v2})² = ?`;
   }
   if(t===1){
-    correct = `${a}²-2${mid}+${b}²`;
-    return `(${a} - ${b})² = ?`;
+    correct = `${v1}²-2${mid}+${v2}²`;
+    return `(${v1} - ${v2})² = ?`;
   }
 
-  correct = `${a}²-${b}²`;
-  return `(${a} + ${b}) · (${a} - ${b}) = ?`;
+  correct = `${v1}²-${v2}²`;
+  return `(${v1} + ${v2}) · (${v1} - ${v2}) = ?`;
 }
 
 // --------------------------------------------------
-// Aufgaben Level 2
+// Level 2 – Zahl + Variable (alphabetisch)
 // --------------------------------------------------
 function createLevel2(){
-  let v=rc(VARS), w=rc(VARS);
-  if(v===w) return createLevel2();
+  let v = rc(VARS), w = rc(VARS);
+  if(v === w) return createLevel2();
 
-  let n=Math.floor(Math.random()*6)+2;
-  let type=Math.floor(Math.random()*3);
+  let vars = [v,w].sort();
+  let v1 = vars[0];
+  let v2 = vars[1];
 
-  const mid2=[v,w].sort().join("");
+  let n = Math.floor(Math.random()*6)+2;
+  let type = Math.floor(Math.random()*3);
+
+  const mid = v1 + v2;
 
   if(type===0){
-    correct = `${v}²+${2*n}${mid2}+${n*n}${w}²`;
-    return `(${v} + ${n}${w})² = ?`;
+    correct = `${v1}²+${2*n}${mid}+${n*n}${v2}²`;
+    return `(${v1} + ${n}${v2})² = ?`;
   }
   if(type===1){
-    correct = `${v}²-${2*n}${mid2}+${n*n}${w}²`;
-    return `(${v} - ${n}${w})² = ?`;
+    correct = `${v1}²-${2*n}${mid}+${n*n}${v2}²`;
+    return `(${v1} - ${n}${v2})² = ?`;
   }
 
-  correct = `${v}²-${n*n}${w}²`;
-  return `(${v} + ${n}${w}) · (${v} - ${n}${w}) = ?`;
+  correct = `${v1}²-${n*n}${v2}²`;
+  return `(${v1} + ${n}${v2}) · (${v1} - ${n}${v2}) = ?`;
 }
 
 // --------------------------------------------------
-// Aufgaben Level 3
+// Level 3 – ax + by (alphabetisch)
 // --------------------------------------------------
 function createLevel3(){
-  let v1=rc(VARS), v2=rc(VARS);
-  if(v1===v2) return createLevel3();
+  let v1 = rc(VARS), v2 = rc(VARS);
+  if(v1 === v2) return createLevel3();
 
-  let a=Math.floor(Math.random()*4)+2;
-  let b=Math.floor(Math.random()*4)+2;
+  let vars = [v1,v2].sort();
+  let x = vars[0];
+  let y = vars[1];
 
-  const mid=[v1,v2].sort().join("");
+  let a = Math.floor(Math.random()*4)+2;
+  let b = Math.floor(Math.random()*4)+2;
 
-  let t=Math.random()<0.7?0:1;
+  const mid = x + y;
+  let t = Math.random()<0.7 ? 0 : 1;
 
   if(t===0){
-    correct = `${a*a}${v1}²+${2*a*b}${mid}+${b*b}${v2}²`;
-    return `(${a}${v1} + ${b}${v2})² = ?`;
+    correct = `${a*a}${x}²+${2*a*b}${mid}+${b*b}${y}²`;
+    return `(${a}${x} + ${b}${y})² = ?`;
   }
 
-  correct = `${a*a}${v1}²-${b*b}${v2}²`;
-  return `(${a}${v1} + ${b}${v2}) · (${a}${v1} - ${b}${v2}) = ?`;
+  correct = `${a*a}${x}²-${b*b}${y}²`;
+  return `(${a}${x} + ${b}${y}) · (${a}${x} - ${b}${y}) = ?`;
 }
 
 // --------------------------------------------------
-// Level beenden + Level-Up
+// Level-Ende
 // --------------------------------------------------
 function finishLevel(){
   if(score >= 8){
     if(level < 3){
-      alert(`🎉 Level ${level} geschafft! Du steigst auf zu Level ${level+1}!`);
+      alert(`🎉 Level ${level} geschafft!`);
       level++;
     } else {
-      alert(`🏆 Level 3 geschafft! Alle Levels abgeschlossen!`);
+      alert("🏆 Alle Levels geschafft!");
     }
   } else {
-    alert(`❌ Level nicht geschafft. Du brauchst mindestens 8 Punkte.`);
+    alert("❌ Level nicht geschafft (mind. 8 Punkte nötig)");
   }
 
-  // Reset
   round = 1;
   score = 0;
   segments.forEach(s=>s.style.background="#ddd");
@@ -210,7 +219,6 @@ function finishLevel(){
 function newTask(){
   result.innerHTML="";
   answer.value="";
-
   answered=false;
   firstTry=true;
 
@@ -218,8 +226,8 @@ function newTask(){
     finishLevel();
   }
 
-  levelDisplay.textContent=`Level ${level}`;
-  scoreEl.textContent=`Aufgabe ${round} von ${total} – Punkte: ${score}`;
+  levelDisplay.textContent = `Level ${level}`;
+  scoreEl.textContent = `Aufgabe ${round} von ${total} – Punkte: ${score}`;
 
   if(level===1) task.textContent=createLevel1();
   else if(level===2) task.textContent=createLevel2();
@@ -227,66 +235,48 @@ function newTask(){
 }
 
 // --------------------------------------------------
-// CHECK – identisch zum funktionierenden Multiplikationstrainer
+// Prüfen
 // --------------------------------------------------
 function check(){
-  const input=answer.value.trim();
+  const input = answer.value.trim();
   if(!input){
-    result.style.color="#555";
     result.textContent="Bitte gib eine Lösung ein.";
     return;
   }
-  answer.blur();
 
-  const inpNorm=sortVars(input);
-  const solNorm=sortVars(correct);
+  const inpNorm = sortVars(input);
+  const solNorm = sortVars(correct);
 
-  // Zweiter Klick → kein Balken, keine Punkte
   if(answered){
-    if(inpNorm===solNorm){
-      result.style.color="green";
-      result.textContent="✅ Richtig – aber kein Punkt mehr";
-    } else {
-      result.style.color="black";
-      result.innerHTML=`❌ Falsch! Richtige Lösung: <b>${correct}</b>`;
-    }
+    result.innerHTML =
+      inpNorm===solNorm
+      ? "✅ Richtig – aber kein Punkt mehr"
+      : `❌ Falsch! Richtige Lösung: <b>${correct}</b>`;
     return;
   }
 
   answered = true;
 
   if(inpNorm===solNorm){
-    result.style.color="green";
-
-    if(firstTry){
-      result.textContent="✅ Richtig! (+1 Punkt)";
-      score++;
-    } else {
-      result.textContent="✅ Richtig – aber kein Punkt mehr";
-    }
-
+    result.textContent="✅ Richtig! (+1 Punkt)";
+    score++;
     segments[round-1].style.background="#4caf50";
-
   } else {
-    result.style.color="black";
-    segments[round-1].style.background="#d9534f";
-
-    result.innerHTML=
+    result.innerHTML =
       `❌ Falsch! Richtige Lösung: <b>${correct}</b><br><br><b>Hinweis:</b><br>${fixedHint[level]}`;
+    segments[round-1].style.background="#d9534f";
   }
 
-  firstTry = false;
   round++;
-
-  scoreEl.textContent=
+  scoreEl.textContent =
     `Aufgabe ${Math.min(round,total)} von ${total} – Punkte: ${score}`;
 }
 
 // --------------------------------------------------
 // Events
 // --------------------------------------------------
-checkBtn.onclick=check;
-newBtn.onclick=newTask;
+checkBtn.onclick = check;
+newBtn.onclick = newTask;
 answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
 
 // Start
@@ -298,6 +288,3 @@ newTask();
 
 </body>
 </html>
-
-
-
